@@ -5,17 +5,16 @@
 Add private notes to GitHub users, right next to their names. Works on Microsoft Edge and Firefox (Manifest V3).
 
 > Coming soon to Edge Add-ons and Firefox Add-ons. Until then, load it from source as described below.
->
-> The interface is currently in Simplified Chinese only.
 
 ## Features
 
 - **Notes everywhere**: user profiles (full note under the name), followers / following lists, organization and team member pages, issue / PR / comment authors, repository contributor lists, sidebar participant avatars
 - **Click to edit**: click a note tag to add, edit or delete it in a small popover (`Ctrl+Enter` to save, `Esc` to cancel)
-- **Unobtrusive**: users without a note only show a faint `+备注` ("add note") button on hover; @mentions in comment text and hovercards only show existing notes
+- **Unobtrusive**: users without a note only show a faint `+ Note` button on hover; @mentions in comment text and hovercards only show existing notes
 - **Theme-aware**: follows GitHub's light / dark theme
 - **Manager panel**: click the toolbar icon to search all notes, edit or delete them, add one manually, and see storage usage
 - **Backup & migration**: JSON export / import, also for moving between Edge and Firefox
+- **Chinese / English UI**: follows your browser language by default, and can be switched to 中文 or English at the top of the panel; tags and the editor on open GitHub pages switch instantly without a refresh
 - **Private**: no server and no network requests. Notes stay in your own browser and sync through your own browser account if browser sync is on
 
 ## Install
@@ -38,21 +37,21 @@ Clone the repository with `git clone https://github.com/suolk/ghwho.git`, or use
 
 1. Open `about:debugging#/runtime/this-firefox`
 2. Click **Load Temporary Add-on…** and select `manifest.json` in the repository root
-3. If the toolbar panel says it has no access to github.com ("尚未授权访问 github.com"), click **授权** (Grant) and allow it
+3. If the toolbar panel says it has no access to github.com, click **Grant** and allow it
 4. Temporary add-ons are removed when Firefox closes
 
 Then open any GitHub page. After changing the code, click **Reload** on the extensions page and refresh the GitHub tab.
 
 ## Usage
 
-- **Add a note**: hover near a username and click `+备注`, or click **+ 添加备注** under the name on a profile page
+- **Add a note**: hover near a username and click `+ Note`, or click **+ Add note** under the name on a profile page
 - **Edit / delete**: click the yellow note tag
 - **Manage all notes**: click the extension icon in the toolbar
 
 ### Moving between Edge and Firefox
 
-1. In the old browser's panel, click **导出 JSON** (Export JSON) to get `ghwho-notes-YYYYMMDD.json`
-2. In the new browser's panel, choose **合并导入** (merge: keep the newer note per user) or **覆盖导入** (replace: clear everything first), then click **导入 JSON** (Import JSON) and pick the file
+1. In the old browser's panel, click **Export JSON** to get `ghwho-notes-YYYYMMDD.json`
+2. In the new browser's panel, choose **Merge** (keep the newer note per user) or **Replace** (clear everything first), then click **Import JSON** and pick the file
 
 > Firefox closes the toolbar panel when a file picker opens, so on Firefox the import button opens the manager in a new tab, where you pick the file.
 
@@ -95,7 +94,9 @@ Import also accepts a plain `{ "username": { "note", "updatedAt" } }` object, `{
 
 ```
 manifest.json         Extension manifest (MV3, with Firefox browser_specific_settings.gecko)
+_locales/             Localized extension name and description (standard browser i18n, used by stores and the extensions page)
 src/selectors.js      All selectors and matching rules (the main file to update when GitHub changes)
+src/i18n.js           UI strings (Chinese / English) and language switching
 src/storage.js        Storage wrapper: storage.sync, quota checks, import / export
 src/content.js        Injection: user link detection, tags, editor popover, DOM / Turbo observers
 src/content.css       Tag and popover styles (GitHub CSS variables)
@@ -105,6 +106,12 @@ scripts/pack.mjs      Dependency-free packer that builds the Edge and Firefox zi
 ```
 
 All extension API calls go through `const api = globalThis.browser ?? globalThis.chrome;`, so the same code runs on Edge and Firefox.
+
+### UI language
+
+- All UI strings live in `MESSAGES` in [`src/i18n.js`](src/i18n.js). The `zh-CN` and `en` dictionaries must have the same keys; a missing key falls back to Chinese
+- The language preference is stored under the `__ghwho_settings` key in `storage.sync` (`auto` / `zh-CN` / `en`). It is not a valid GitHub username, so it is never read as a note, exported, or removed by a replace import
+- The extension name, description and toolbar tooltip use the standard [`_locales`](_locales) mechanism and follow the browser language, independent of the panel switch
 
 ### Maintaining selectors
 
@@ -116,7 +123,7 @@ Everything lives in [`src/selectors.js`](src/selectors.js):
 | `fallbackLinks` + `reservedPaths` | URL fallback: `/<username>` links whose text is the username and whose path is not reserved |
 | `avatar` | Detects avatar-only links |
 | `ignoreWithin` | Areas never processed (global header, footer, …) |
-| `noAddWithin` | Areas that show existing notes but no `+备注` button |
+| `noAddWithin` | Areas that show existing notes but no `+ Note` button |
 | `profile` | The username block on profile pages |
 
 Debugging tip: processed links get a `data-ghwho-user` attribute (the detected username, or an empty string for non-user links). Inspect them with `document.querySelectorAll('[data-ghwho-user]')`.

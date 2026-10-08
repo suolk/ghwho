@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "ghwho - GitHub 用户备注",
-  "short_name": "ghwho",
+  "name": "__MSG_extName__",
+  "short_name": "__MSG_extShortName__",
   "version": "1.0.0",
+  "default_locale": "zh_CN",
   "homepage_url": "https://home.suolk.cc.cd",
-  "description": "给 GitHub 用户添加私人备注，并在 GitHub 页面上用户名出现的地方显示。",
+  "description": "__MSG_extDescription__",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -12,7 +13,7 @@
     "128": "icons/icon-128.png"
   },
   "action": {
-    "default_title": "GitHub 用户备注",
+    "default_title": "__MSG_actionTitle__",
     "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
@@ -20,13 +21,26 @@
       "48": "icons/icon-48.png"
     }
   },
-  "permissions": ["storage"],
-  "host_permissions": ["https://github.com/*"],
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://github.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://github.com/*"],
-      "js": ["src/selectors.js", "src/storage.js", "src/content.js"],
-      "css": ["src/content.css"],
+      "matches": [
+        "https://github.com/*"
+      ],
+      "js": [
+        "src/selectors.js",
+        "src/i18n.js",
+        "src/storage.js",
+        "src/content.js"
+      ],
+      "css": [
+        "src/content.css"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -35,7 +49,9 @@
       "id": "ghwho@suolk.cc.cd",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
-        "required": ["none"]
+        "required": [
+          "none"
+        ]
       }
     }
   }

@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "ghwho - GitHub 用户备注"
+  },
+  "extShortName": {
+    "message": "ghwho"
+  },
+  "extDescription": {
+    "message": "给 GitHub 用户添加私人备注，并在 GitHub 页面上用户名出现的地方显示。"
+  },
+  "actionTitle": {
+    "message": "GitHub 用户备注"
+  }
+}

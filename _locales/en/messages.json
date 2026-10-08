@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "ghwho - GitHub User Notes"
+  },
+  "extShortName": {
+    "message": "ghwho"
+  },
+  "extDescription": {
+    "message": "Add private notes to GitHub users and see them next to their names across GitHub."
+  },
+  "actionTitle": {
+    "message": "GitHub User Notes"
+  }
+}

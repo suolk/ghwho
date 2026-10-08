@@ -1,6 +1,8 @@
 (() => {
   const api = globalThis.browser ?? globalThis.chrome;
   const store = globalThis.GHWho.storage;
+  const i18n = globalThis.GHWho.i18n;
+  const { t } = i18n;
 
   const GITHUB_ORIGINS = ['https://github.com/*'];
   const isFirefox = typeof api.runtime.getBrowserInfo === 'function';
@@ -28,6 +30,7 @@
     importMode: $('import-mode'),
     importFile: $('import-file'),
     openTab: $('open-tab'),
+    lang: $('lang'),
   };
 
   /** @type {Record<string, {note: string, updatedAt: number}>} */
@@ -65,20 +68,25 @@
   }
 
   /* 两次点击确认（扩展弹窗里不能可靠地使用 confirm()） */
+  const confirmState = new WeakMap(); // btn -> { original, timer }
+
+  function resetConfirm(btn) {
+    const s = confirmState.get(btn);
+    if (!s) return;
+    clearTimeout(s.timer);
+    confirmState.delete(btn);
+    delete btn.dataset.ghwhoConfirm;
+    btn.textContent = s.original;
+  }
+
   function confirmClick(btn, label, action) {
-    if (btn.dataset.ghwhoConfirm) {
-      delete btn.dataset.ghwhoConfirm;
+    if (confirmState.has(btn)) {
+      resetConfirm(btn);
       return action();
     }
-    const original = btn.textContent;
+    confirmState.set(btn, { original: btn.textContent, timer: setTimeout(() => resetConfirm(btn), 3000) });
     btn.dataset.ghwhoConfirm = '1';
     btn.textContent = label;
-    setTimeout(() => {
-      if (btn.dataset.ghwhoConfirm) {
-        delete btn.dataset.ghwhoConfirm;
-        btn.textContent = original;
-      }
-    }, 3000);
   }
 
   /* ---------------------------------------------------------------- 权限 */
@@ -100,10 +108,10 @@
       .request({ origins: GITHUB_ORIGINS })
       .then((granted) => {
         checkPermission();
-        if (granted) flash('授权成功！请刷新已打开的 GitHub 页面。', 'success', 6000);
-        else flash('未授权，备注将无法在 GitHub 页面上显示。', 'warn');
+        if (granted) flash(t('perm.granted'), 'success', 6000);
+        else flash(t('perm.denied'), 'warn');
       })
-      .catch((err) => flash(`授权失败：${err?.message ?? err}`, 'error'));
+      .catch((err) => flash(t('perm.failed', { msg: err?.message ?? err }), 'error'));
   });
 
   api.permissions?.onAdded?.addListener(checkPermission);
@@ -125,9 +133,7 @@
 
     const total = Object.keys(notes).length;
     ui.empty.hidden = items.length > 0;
-    ui.empty.textContent = total === 0
-      ? '还没有备注。在 GitHub 页面上悬停用户名，点击“+备注”即可添加。'
-      : `没有匹配“${ui.search.value.trim()}”的备注。`;
+    ui.empty.textContent = total === 0 ? t('list.empty') : t('list.noMatch', { q: ui.search.value.trim() });
   }
 
   function renderItem(user, entry) {
@@ -161,8 +167,8 @@
         head,
         textarea,
         el('div', { class: 'row-actions' }, [
-          el('button', { class: 'btn', type: 'button', text: '取消', onclick: () => { editing = null; render(); } }),
-          el('button', { class: 'btn btn-primary', type: 'button', text: '保存', onclick: save }),
+          el('button', { class: 'btn', type: 'button', text: t('common.cancel'), onclick: () => { editing = null; render(); } }),
+          el('button', { class: 'btn btn-primary', type: 'button', text: t('common.save'), onclick: save }),
         ]),
       );
       queueMicrotask(() => {
@@ -172,7 +178,7 @@
       return li;
     }
 
-    const delBtn = el('button', { class: 'link-btn danger', type: 'button', text: '删除' });
+    const delBtn = el('button', { class: 'link-btn danger', type: 'button', text: t('common.delete') });
     delBtn.addEventListener('click', async () => {
       try {
         await store.remove(user);
@@ -184,9 +190,9 @@
 
     li.append(
       head,
-      el('p', { class: 'item-note', text: entry.note, title: '双击编辑', ondblclick: () => startEdit(user) }),
+      el('p', { class: 'item-note', text: entry.note, title: t('list.dblclick'), ondblclick: () => startEdit(user) }),
       el('div', { class: 'item-actions' }, [
-        el('button', { class: 'link-btn', type: 'button', text: '编辑', onclick: () => startEdit(user) }),
+        el('button', { class: 'link-btn', type: 'button', text: t('common.edit'), onclick: () => startEdit(user) }),
         delBtn,
       ]),
     );
@@ -204,9 +210,13 @@
       const ratio = Math.min(1, u.bytes / u.quota);
       ui.meterBar.style.width = `${(ratio * 100).toFixed(1)}%`;
       ui.meterBar.classList.toggle('warn', ratio >= 0.8 || u.count >= u.maxItems * 0.9);
-      ui.usageText.textContent = `${u.count} 条 · ${store.formatKB(u.bytes)} / ${store.formatKB(u.quota)}`;
+      ui.usageText.textContent = t('usage.text', {
+        count: u.count,
+        used: store.formatKB(u.bytes),
+        quota: store.formatKB(u.quota),
+      });
       if (ratio >= 0.8) {
-        ui.usageText.title = '同步存储空间即将用尽，建议导出备份并精简备注。';
+        ui.usageText.title = t('usage.warn');
         ui.usageText.classList.add('warn');
       } else {
         ui.usageText.title = '';
@@ -221,7 +231,7 @@
     try {
       notes = await store.getAll();
     } catch (err) {
-      flash(`读取备注失败：${err?.message ?? err}`, 'error', 0);
+      flash(t('list.loadFailed', { msg: err?.message ?? err }), 'error', 0);
       notes = {};
     }
     render();
@@ -248,7 +258,7 @@
     e.preventDefault();
     const user = store.normalizeUsername(ui.addUser.value);
     if (!user) {
-      flash('请输入有效的 GitHub 用户名（字母、数字、连字符，最长 39 位）。', 'error');
+      flash(t('add.invalidUser'), 'error');
       ui.addUser.focus();
       return;
     }
@@ -256,7 +266,7 @@
       const existed = !!notes[user];
       await store.set(user, ui.addNote.value);
       toggleAdd(false);
-      flash(existed ? `已更新 @${user} 的备注。` : `已添加 @${user} 的备注。`, 'success');
+      flash(t(existed ? 'add.updated' : 'add.added', { user }), 'success');
       await reload();
     } catch (err) {
       flash(err.message, 'error', 8000);
@@ -288,9 +298,9 @@
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      flash(`已导出 ${count} 条备注。`, 'success');
+      flash(t('io.exported', { count }), 'success');
     } catch (err) {
-      flash(`导出失败：${err?.message ?? err}`, 'error');
+      flash(t('io.exportFailed', { msg: err?.message ?? err }), 'error');
     }
   });
 
@@ -305,8 +315,10 @@
     ui.importFile.click();
   }
 
+  ui.importMode.addEventListener('change', () => resetConfirm(ui.importBtn));
+
   ui.importBtn.addEventListener('click', () => {
-    if (ui.importMode.value === 'replace') confirmClick(ui.importBtn, '确认覆盖？', pickFile);
+    if (ui.importMode.value === 'replace') confirmClick(ui.importBtn, t('io.confirmReplace'), pickFile);
     else pickFile();
   });
 
@@ -317,20 +329,20 @@
     try {
       data = JSON.parse(await file.text());
     } catch {
-      flash('文件不是有效的 JSON。', 'error');
+      flash(t('io.badJson'), 'error');
       return;
     }
     try {
       const mode = ui.importMode.value;
       const r = await store.importData(data, { mode });
-      const parts = [`写入 ${r.written} 条`];
-      if (r.unchanged) parts.push(`未变化/保留较新 ${r.unchanged} 条`);
-      if (r.removed) parts.push(`删除 ${r.removed} 条`);
-      if (r.skipped) parts.push(`跳过无效 ${r.skipped} 条`);
-      flash(`导入完成：${parts.join('，')}。`, 'success', 8000);
+      const parts = [t('io.written', { n: r.written })];
+      if (r.unchanged) parts.push(t('io.unchanged', { n: r.unchanged }));
+      if (r.removed) parts.push(t('io.removed', { n: r.removed }));
+      if (r.skipped) parts.push(t('io.skipped', { n: r.skipped }));
+      flash(t('io.imported', { parts: parts.join(t('common.listSep')) }), 'success', 8000);
       await reload();
     } catch (err) {
-      flash(`导入失败：${err?.message ?? err}`, 'error', 10000);
+      flash(t('io.importFailed', { msg: err?.message ?? err }), 'error', 10000);
     }
   });
 
@@ -340,19 +352,45 @@
     window.close();
   });
 
+  /* ---------------------------------------------------------------- 语言 */
+
+  function applyLanguage() {
+    resetConfirm(ui.importBtn);
+    document.documentElement.lang = i18n.getLang();
+    ui.lang.value = i18n.getPreference();
+    i18n.translateDom();
+    // 正在编辑时不重绘列表，避免丢掉未保存的输入
+    if (!editing) render();
+    renderUsage();
+  }
+
+  ui.lang.addEventListener('change', async () => {
+    try {
+      await i18n.setPreference(ui.lang.value);
+    } catch (err) {
+      flash(err?.message ?? String(err), 'error');
+    }
+    ui.lang.value = i18n.getPreference();
+  });
+
+  i18n.onChange(applyLanguage);
+
   /* ---------------------------------------------------------------- 启动 */
 
   store.onChanged(() => {
     if (!editing) reload();
   });
 
-  checkPermission();
-  reload().then(() => {
+  (async () => {
+    await i18n.init();
+    applyLanguage();
+    checkPermission();
+    await reload();
     if (isTab && location.hash === '#import') {
       if (params.get('mode') === 'replace') ui.importMode.value = 'replace';
-      flash('请点击“导入 JSON”选择备份文件。', 'info', 8000);
+      flash(t('io.importHint'), 'info', 8000);
       ui.importBtn.focus();
     }
-  });
+  })();
   if (!isTab) ui.search.focus();
 })();

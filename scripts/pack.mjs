@@ -15,7 +15,7 @@ import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const INCLUDE = ['manifest.json', 'src', 'popup', 'icons'];
+const INCLUDE = ['manifest.json', '_locales', 'src', 'popup', 'icons'];
 const IGNORE = /(^|\/)(\.DS_Store|Thumbs\.db|desktop\.ini)$/i;
 
 const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {

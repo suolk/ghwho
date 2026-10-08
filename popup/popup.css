@@ -98,6 +98,29 @@ html.is-tab body {
   color: var(--fg);
 }
 
+.lang-select {
+  height: 26px;
+  padding: 0 4px;
+  color: var(--fg-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.lang-select:hover,
+.lang-select:focus {
+  color: var(--fg);
+}
+
+.lang-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
 .banner {
   margin: 8px 12px 0;
   padding: 8px 10px;

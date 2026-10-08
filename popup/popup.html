@@ -4,37 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>GitHub 用户备注</title>
+  <title data-i18n="app.title">GitHub 用户备注</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <header class="top">
     <img class="logo" src="../icons/icon-32.png" width="20" height="20" alt="">
-    <h1>GitHub 用户备注</h1>
-    <button id="open-tab" class="icon-btn" type="button" title="在标签页中打开">⤢</button>
+    <h1 data-i18n="app.title">GitHub 用户备注</h1>
+    <select id="lang" class="lang-select" data-i18n-title="lang.title" data-i18n-aria-label="lang.title">
+      <option value="auto" data-i18n="lang.auto">自动</option>
+      <option value="zh-CN">中文</option>
+      <option value="en">English</option>
+    </select>
+    <button id="open-tab" class="icon-btn" type="button" data-i18n-title="popup.openTab" data-i18n-aria-label="popup.openTab">⤢</button>
   </header>
 
   <section id="perm-banner" class="banner banner-warn" hidden>
     <div>
-      <strong>尚未授权访问 github.com</strong>
-      <p>扩展需要该权限才能在 GitHub 页面上显示备注。</p>
+      <strong data-i18n="perm.title"></strong>
+      <p data-i18n="perm.desc"></p>
     </div>
-    <button id="perm-grant" class="btn btn-primary" type="button">授权</button>
+    <button id="perm-grant" class="btn btn-primary" type="button" data-i18n="perm.grant"></button>
   </section>
 
   <div id="flash" class="banner" role="status" hidden></div>
 
   <section class="toolbar">
-    <input id="search" class="input" type="search" placeholder="搜索用户名或备注…" autocomplete="off" spellcheck="false">
-    <button id="add-toggle" class="btn" type="button" aria-expanded="false">+ 新增</button>
+    <input id="search" class="input" type="search" data-i18n-placeholder="search.placeholder" autocomplete="off" spellcheck="false">
+    <button id="add-toggle" class="btn" type="button" aria-expanded="false" data-i18n="add.toggle"></button>
   </section>
 
   <form id="add-form" class="add-form" hidden>
-    <input id="add-user" class="input" type="text" placeholder="GitHub 用户名" autocomplete="off" spellcheck="false" required>
-    <textarea id="add-note" class="input" rows="2" placeholder="备注内容" required></textarea>
+    <input id="add-user" class="input" type="text" data-i18n-placeholder="add.userPlaceholder" autocomplete="off" spellcheck="false" required>
+    <textarea id="add-note" class="input" rows="2" data-i18n-placeholder="add.notePlaceholder" required></textarea>
     <div class="row-actions">
-      <button class="btn" type="button" id="add-cancel">取消</button>
-      <button class="btn btn-primary" type="submit">保存</button>
+      <button class="btn" type="button" id="add-cancel" data-i18n="common.cancel"></button>
+      <button class="btn btn-primary" type="submit" data-i18n="common.save"></button>
     </div>
   </form>
 
@@ -49,16 +54,17 @@
       <span id="usage-text"></span>
     </div>
     <div class="io">
-      <button id="export" class="btn" type="button">导出 JSON</button>
-      <select id="import-mode" class="input select" title="导入方式">
-        <option value="merge">合并导入</option>
-        <option value="replace">覆盖导入</option>
+      <button id="export" class="btn" type="button" data-i18n="io.export"></button>
+      <select id="import-mode" class="input select" data-i18n-title="io.mode" data-i18n-aria-label="io.mode">
+        <option value="merge" data-i18n="io.merge"></option>
+        <option value="replace" data-i18n="io.replace"></option>
       </select>
-      <button id="import" class="btn" type="button">导入 JSON</button>
+      <button id="import" class="btn" type="button" data-i18n="io.import"></button>
       <input id="import-file" type="file" accept=".json,application/json" hidden>
     </div>
   </footer>
 
+  <script src="../src/i18n.js"></script>
   <script src="../src/storage.js"></script>
   <script src="popup.js"></script>
 </body>

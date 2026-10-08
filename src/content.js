@@ -1,15 +1,17 @@
 /*
  * 在 github.com 页面上注入用户备注标签。
- * 依赖 selectors.js（GHWho.SELECTORS）与 storage.js（GHWho.storage），需在 manifest 中先于本文件加载。
+ * 依赖 selectors.js（GHWho.SELECTORS）、i18n.js（GHWho.i18n）与 storage.js（GHWho.storage），需在 manifest 中先于本文件加载。
  */
 (() => {
   const api = globalThis.browser ?? globalThis.chrome;
   const GHWho = globalThis.GHWho;
-  if (!GHWho?.storage || !GHWho?.SELECTORS || GHWho.contentStarted) return;
+  if (!GHWho?.storage || !GHWho?.SELECTORS || !GHWho?.i18n || GHWho.contentStarted) return;
   GHWho.contentStarted = true;
 
   const S = GHWho.SELECTORS;
   const store = GHWho.storage;
+  const i18n = GHWho.i18n;
+  const { t } = i18n;
   const { normalizeUsername } = store;
 
   const LINK_QUERY = [...S.userLinks, S.fallbackLinks].join(', ');
@@ -133,12 +135,12 @@
         text.textContent = mode === 'profile' ? entry.note : entry.note.replace(/\s+/g, ' ');
         badge.append(text);
       }
-      badge.title = `@${user} 的备注：\n${entry.note}\n\n点击编辑`;
-      badge.setAttribute('aria-label', `@${user} 的备注：${entry.note}。点击编辑`);
+      badge.title = t('badge.noteTitle', { user, note: entry.note });
+      badge.setAttribute('aria-label', t('badge.noteAria', { user, note: entry.note }));
     } else {
-      badge.textContent = mode === 'profile' ? '+ 添加备注' : '+备注';
-      badge.title = `为 @${user} 添加备注`;
-      badge.setAttribute('aria-label', `为 @${user} 添加备注`);
+      badge.textContent = t(mode === 'profile' ? 'badge.addProfile' : 'badge.addInline');
+      badge.title = t('badge.addTitle', { user });
+      badge.setAttribute('aria-label', badge.title);
     }
   }
 
@@ -329,7 +331,7 @@
 
   function formatTime(ts) {
     try {
-      return new Date(ts).toLocaleString();
+      return new Date(ts).toLocaleString(i18n.getLang());
     } catch {
       return '';
     }
@@ -360,8 +362,8 @@
       class: 'ghwho-textarea',
       rows: '4',
       maxlength: String(store.MAX_NOTE_LENGTH),
-      placeholder: '写点什么……（Ctrl+Enter 保存，Esc 取消）',
-      'aria-label': `@${user} 的备注`,
+      placeholder: t('editor.placeholder'),
+      'aria-label': t('editor.textareaAria', { user }),
     });
     textarea.value = entry?.note ?? '';
 
@@ -372,9 +374,9 @@
     };
     updateCounter();
 
-    const saveBtn = el('button', { type: 'button', class: 'ghwho-btn ghwho-btn-primary', text: '保存' });
-    const cancelBtn = el('button', { type: 'button', class: 'ghwho-btn', text: '取消' });
-    const deleteBtn = el('button', { type: 'button', class: 'ghwho-btn ghwho-btn-danger', text: '删除' });
+    const saveBtn = el('button', { type: 'button', class: 'ghwho-btn ghwho-btn-primary', text: t('common.save') });
+    const cancelBtn = el('button', { type: 'button', class: 'ghwho-btn', text: t('common.cancel') });
+    const deleteBtn = el('button', { type: 'button', class: 'ghwho-btn ghwho-btn-danger', text: t('common.delete') });
     deleteBtn.hidden = !entry;
 
     const setBusy = (busy) => {
@@ -411,11 +413,11 @@
     textarea.addEventListener('input', updateCounter);
     const root = el(
       'div',
-      { class: 'ghwho-popover', role: 'dialog', 'aria-label': `编辑 @${user} 的备注`, 'data-ghwho-ignore': '' },
+      { class: 'ghwho-popover', role: 'dialog', 'aria-label': t('editor.dialogAria', { user }), 'data-ghwho-ignore': '' },
       [
         el('div', { class: 'ghwho-pop-header' }, [
           el('a', { class: 'ghwho-pop-user', href: `/${user}`, text: `@${user}` }),
-          el('span', { class: 'ghwho-pop-meta', text: entry ? `更新于 ${formatTime(entry.updatedAt)}` : '新备注' }),
+          el('span', { class: 'ghwho-pop-meta', text: entry ? t('editor.updated', { time: formatTime(entry.updatedAt) }) : t('editor.new') }),
         ]),
         textarea,
         msg,
@@ -457,9 +459,16 @@
     for (const [user, entry] of Object.entries(changes)) applyChange(user, entry);
   });
 
+  /* 切换界面语言：重绘所有标签；编辑弹窗直接关闭，避免半中半英 */
+  i18n.onChange(() => {
+    closeEditor();
+    for (const badge of document.querySelectorAll('.ghwho-badge')) renderBadge(badge);
+  });
+
   /* ---------------------------------------------------------------- 启动 */
 
   async function start() {
+    await i18n.init();
     try {
       notes = await store.getAll();
     } catch (err) {

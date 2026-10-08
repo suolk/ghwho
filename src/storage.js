@@ -1,5 +1,5 @@
 /*
- * 备注存储封装（content script 与 popup 共用）。
+ * 备注存储封装（content script 与 popup 共用，需在 i18n.js 之后加载）。
  *
  * 数据结构：storage.sync 中，键为小写 GitHub 用户名，值为 { note, updatedAt }。
  * storage.sync 的配额（Chrome/Edge/Firefox 基本一致）：
@@ -18,6 +18,8 @@
   const USERNAME_RE = /^[a-z\d](?:[a-z\d-]{0,38})$/i;
 
   const encoder = new TextEncoder();
+  /* 文案来自 i18n.js；未加载时原样返回键名 */
+  const t = (key, params) => GHWho.i18n?.t(key, params) ?? key;
 
   class NoteError extends Error {
     constructor(message, code) {
@@ -83,21 +85,18 @@
       const size = itemBytes(key, next[key]);
       if (size > QUOTA_BYTES_PER_ITEM) {
         throw new NoteError(
-          `@${key} 的备注过长（${formatKB(size)}），单条上限约 ${formatKB(QUOTA_BYTES_PER_ITEM)}。`,
+          t('err.itemQuota', { user: key, size: formatKB(size), limit: formatKB(QUOTA_BYTES_PER_ITEM) }),
           'ITEM_QUOTA',
         );
       }
     }
     const count = Object.keys(next).length;
     if (count > MAX_ITEMS) {
-      throw new NoteError(`备注数量将达到 ${count} 条，超过同步存储上限 ${MAX_ITEMS} 条。请先删除一些备注。`, 'MAX_ITEMS');
+      throw new NoteError(t('err.maxItems', { count, max: MAX_ITEMS }), 'MAX_ITEMS');
     }
     const bytes = totalBytes(next);
     if (bytes > QUOTA_BYTES) {
-      throw new NoteError(
-        `同步存储空间不足：写入后将占用 ${formatKB(bytes)}，上限 ${formatKB(QUOTA_BYTES)}。请先删除或精简一些备注。`,
-        'QUOTA',
-      );
+      throw new NoteError(t('err.quota', { bytes: formatKB(bytes), quota: formatKB(QUOTA_BYTES) }), 'QUOTA');
     }
   }
 
@@ -106,25 +105,25 @@
     if (err instanceof NoteError) return err;
     const msg = String(err?.message ?? err);
     if (/QUOTA_BYTES|quota/i.test(msg)) {
-      return new NoteError('同步存储空间已满（约 100KB），请删除一些备注后重试。', 'QUOTA');
+      return new NoteError(t('err.quotaFull'), 'QUOTA');
     }
     if (/MAX_WRITE_OPERATIONS/i.test(msg)) {
-      return new NoteError('保存过于频繁，浏览器限制了同步存储的写入次数，请稍后再试。', 'RATE');
+      return new NoteError(t('err.rate'), 'RATE');
     }
     if (/Extension context invalidated/i.test(msg)) {
-      return new NoteError('扩展已更新或重新加载，请刷新页面后再试。', 'INVALIDATED');
+      return new NoteError(t('err.invalidated'), 'INVALIDATED');
     }
-    return new NoteError(`保存失败：${msg}`, 'UNKNOWN');
+    return new NoteError(t('err.unknown', { msg }), 'UNKNOWN');
   }
 
   /* 设置备注；note 为空时等同于删除 */
   async function set(username, note) {
     const key = normalizeUsername(username);
-    if (!key) throw new NoteError(`无效的 GitHub 用户名：${username}`, 'INVALID_USER');
+    if (!key) throw new NoteError(t('err.invalidUser', { user: username }), 'INVALID_USER');
     const text = String(note ?? '').trim();
     if (!text) return remove(key);
     if (text.length > MAX_NOTE_LENGTH) {
-      throw new NoteError(`备注最多 ${MAX_NOTE_LENGTH} 个字符（当前 ${text.length}）。`, 'TOO_LONG');
+      throw new NoteError(t('err.tooLong', { max: MAX_NOTE_LENGTH, len: text.length }), 'TOO_LONG');
     }
     const entry = { note: text, updatedAt: Date.now() };
     try {
@@ -173,7 +172,7 @@
     } else if (source && typeof source === 'object') {
       pairs.push(...Object.entries(source));
     } else {
-      throw new NoteError('无法识别的 JSON 格式。', 'BAD_FORMAT');
+      throw new NoteError(t('err.badFormat'), 'BAD_FORMAT');
     }
 
     const result = {};

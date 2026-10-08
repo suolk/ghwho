@@ -14,6 +14,7 @@
 - **跟随主题**：自动适配 GitHub 的亮色 / 暗色主题
 - **管理面板**：点击工具栏图标，可以搜索全部备注、编辑删除、手动新增、查看存储用量
 - **备份与迁移**：JSON 导出 / 导入，可在 Edge 与 Firefox 之间迁移
+- **中英文界面**：默认跟随浏览器语言，也可以在扩展面板顶部切换为中文或 English；GitHub 页面上的标签和编辑弹窗会立即同步切换，无需刷新
 - **隐私**：没有服务器、不发任何网络请求，备注只保存在你自己的浏览器里（开启浏览器同步时随你自己的浏览器账号同步）
 
 ## 安装
@@ -93,7 +94,9 @@
 
 ```
 manifest.json         扩展清单（MV3，含 Firefox 的 browser_specific_settings.gecko）
+_locales/             扩展名称、描述的中英文（浏览器标准 i18n，用于商店和扩展管理页）
 src/selectors.js      所有选择器与识别规则（GitHub 改版后主要改这里）
+src/i18n.js           界面文案（中文 / English）与语言切换
 src/storage.js        存储封装：storage.sync、配额检查、导入导出
 src/content.js        注入逻辑：识别用户链接、渲染标签、编辑弹窗、监听 DOM / Turbo
 src/content.css       标签与弹窗样式（使用 GitHub 的 CSS 变量）
@@ -103,6 +106,12 @@ scripts/pack.mjs      打包脚本（无依赖），生成 Edge 与 Firefox 的 
 ```
 
 代码中统一使用 `const api = globalThis.browser ?? globalThis.chrome;` 调用扩展 API，同一份代码同时运行在 Edge 和 Firefox 上。
+
+### 界面语言
+
+- 所有界面文案在 [`src/i18n.js`](src/i18n.js) 的 `MESSAGES` 中，`zh-CN` 和 `en` 两份词典的键必须一一对应；缺失的键回退到中文
+- 语言偏好存在 `storage.sync` 的 `__ghwho_settings` 键中（`auto` / `zh-CN` / `en`）。这个键不是合法的 GitHub 用户名，不会被当作备注读取、导出，也不会在覆盖导入时被删除
+- 扩展名称、描述和工具栏按钮提示用浏览器标准的 [`_locales`](_locales) 机制，按浏览器语言显示，不受面板里的切换影响
 
 ### GitHub 改版后的维护
 
