@@ -4,7 +4,7 @@
 
 给 GitHub 用户添加私人备注，显示在用户名旁。支持 Microsoft Edge 和 Firefox（Manifest V3）。
 
-> 即将上线 Edge Add-ons 与 Firefox 附加组件商店，上线前可以按下方步骤从源码加载。
+> 已上架 [Microsoft Edge 加载项商店](https://microsoftedge.microsoft.com/addons/detail/ghwho-github-%E7%94%A8%E6%88%B7%E5%A4%87%E6%B3%A8/jepafcbloaophnopbognfebnepklfoea)；Firefox 版即将上线，上线前可以按下方步骤从源码加载。
 
 ## 功能
 
@@ -21,7 +21,8 @@
 
 ### 从商店安装
 
-即将上线，敬请期待。
+- **Microsoft Edge**：[在 Edge 加载项商店获取](https://microsoftedge.microsoft.com/addons/detail/ghwho-github-%E7%94%A8%E6%88%B7%E5%A4%87%E6%B3%A8/jepafcbloaophnopbognfebnepklfoea)
+- **Firefox**：即将上线
 
 ### 从源码加载（开发 / 预览）
 
