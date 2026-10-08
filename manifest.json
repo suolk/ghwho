@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "ghwho - GitHub 用户备注",
+  "short_name": "ghwho",
+  "version": "1.0.0",
+  "homepage_url": "https://home.suolk.cc.cd",
+  "description": "给 GitHub 用户添加私人备注，并在 GitHub 页面上用户名出现的地方显示。",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "GitHub 用户备注",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://github.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["src/selectors.js", "src/storage.js", "src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ghwho@suolk.cc.cd",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}

@@ -1,0 +1,262 @@
+/*
+ * 备注标签与编辑弹窗样式。
+ * 颜色全部取自 GitHub (Primer) 的 CSS 变量，自动跟随亮色/暗色主题；
+ * 第二个值是旧版变量名，最后是兜底色。
+ */
+
+.ghwho-badge {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 18em;
+  height: 20px;
+  margin-left: 4px;
+  padding: 0 7px;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  border-radius: 2em;
+  font: 500 12px/18px -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none !important;
+  flex-shrink: 0;
+  transition: opacity 0.12s ease, max-width 0.15s ease, background-color 0.12s ease;
+}
+
+.ghwho-badge[hidden] {
+  display: none !important;
+}
+
+.ghwho-badge:focus-visible {
+  outline: 2px solid var(--focus-outlineColor, var(--color-accent-fg, #0969da));
+  outline-offset: 1px;
+}
+
+/* 有备注：便签风格 */
+.ghwho-badge.ghwho-has-note {
+  color: var(--fgColor-attention, var(--color-attention-fg, #9a6700));
+  background-color: var(--bgColor-attention-muted, var(--color-attention-subtle, #fff8c5));
+  border-color: var(--borderColor-attention-muted, var(--color-attention-muted, rgba(212, 167, 44, 0.4)));
+}
+
+.ghwho-badge.ghwho-has-note:hover {
+  border-color: var(--borderColor-attention-emphasis, var(--color-attention-emphasis, #9a6700));
+}
+
+.ghwho-icon {
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.ghwho-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 无备注："+备注" 按钮，平时折叠隐藏，悬停在用户名所在区域时出现 */
+.ghwho-badge.ghwho-add {
+  max-width: 0;
+  margin-left: 0;
+  padding: 0;
+  border-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  color: var(--fgColor-muted, var(--color-fg-muted, #59636e));
+  background: transparent;
+  font-weight: 400;
+}
+
+:hover > .ghwho-badge.ghwho-add,
+:focus-within > .ghwho-badge.ghwho-add,
+.ghwho-badge.ghwho-add:focus-visible {
+  max-width: 6em;
+  margin-left: 4px;
+  padding: 0 6px;
+  border: 1px dashed var(--borderColor-default, var(--color-border-default, #d1d9e0));
+  opacity: 0.9;
+}
+
+.ghwho-badge.ghwho-add:hover {
+  color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
+  border-color: var(--borderColor-accent-emphasis, var(--color-accent-emphasis, #0969da));
+  opacity: 1;
+}
+
+/* 只有头像的位置：只显示一个小图标 */
+.ghwho-badge.ghwho-mode-avatar {
+  height: 18px;
+  margin-left: 2px;
+  padding: 0 4px;
+}
+
+/* 个人主页：完整多行展示，常驻可见 */
+.ghwho-profile {
+  margin: 8px 0 4px;
+}
+
+.ghwho-profile .ghwho-badge {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+  height: auto;
+  min-height: 28px;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 18px;
+  white-space: normal;
+}
+
+.ghwho-profile .ghwho-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow: visible;
+}
+
+.ghwho-profile .ghwho-icon {
+  line-height: 18px;
+}
+
+.ghwho-profile .ghwho-badge.ghwho-add {
+  max-width: 100%;
+  margin: 0;
+  padding: 5px 10px;
+  border: 1px dashed var(--borderColor-default, var(--color-border-default, #d1d9e0));
+  opacity: 0.75;
+  display: inline-flex;
+}
+
+/* ------------------------------------------------------------------ 编辑弹窗 */
+
+.ghwho-popover {
+  position: absolute;
+  z-index: 2147483000;
+  box-sizing: border-box;
+  width: 320px;
+  max-width: calc(100vw - 16px);
+  padding: 12px;
+  color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+  background-color: var(--overlay-bgColor, var(--bgColor-default, var(--color-canvas-overlay, #ffffff)));
+  border: 1px solid var(--borderColor-default, var(--color-border-default, #d1d9e0));
+  border-radius: 12px;
+  box-shadow: var(--shadow-floating-medium, var(--color-shadow-large, 0 8px 24px rgba(140, 149, 159, 0.2)));
+  font: 400 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  text-align: left;
+}
+
+.ghwho-popover * {
+  box-sizing: border-box;
+}
+
+.ghwho-pop-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ghwho-pop-user {
+  font-weight: 600;
+  color: var(--fgColor-default, var(--color-fg-default, #1f2328)) !important;
+}
+
+.ghwho-pop-meta {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--fgColor-muted, var(--color-fg-muted, #59636e));
+}
+
+.ghwho-textarea {
+  display: block;
+  width: 100%;
+  min-height: 84px;
+  max-height: 50vh;
+  padding: 6px 8px;
+  resize: vertical;
+  color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+  background-color: var(--bgColor-default, var(--color-canvas-default, #ffffff));
+  border: 1px solid var(--control-borderColor-rest, var(--borderColor-default, var(--color-border-default, #d1d9e0)));
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.ghwho-textarea:focus {
+  outline: 2px solid var(--focus-outlineColor, var(--color-accent-fg, #0969da));
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.ghwho-msg {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--fgColor-danger, var(--color-danger-fg, #d1242f));
+}
+
+.ghwho-msg:empty {
+  display: none;
+}
+
+.ghwho-pop-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ghwho-spacer {
+  flex: 1;
+}
+
+.ghwho-counter {
+  font-size: 12px;
+  color: var(--fgColor-muted, var(--color-fg-muted, #59636e));
+}
+
+.ghwho-btn {
+  appearance: none;
+  height: 28px;
+  padding: 0 12px;
+  color: var(--button-default-fgColor-rest, var(--fgColor-default, #25292e));
+  background-color: var(--button-default-bgColor-rest, var(--bgColor-muted, #f6f8fa));
+  border: 1px solid var(--button-default-borderColor-rest, var(--borderColor-default, #d1d9e0));
+  border-radius: 6px;
+  font: 500 12px/26px -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ghwho-btn:hover:not(:disabled) {
+  background-color: var(--button-default-bgColor-hover, var(--bgColor-neutral-muted, #eff2f5));
+}
+
+.ghwho-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ghwho-btn-primary {
+  color: var(--button-primary-fgColor-rest, #ffffff);
+  background-color: var(--button-primary-bgColor-rest, var(--bgColor-success-emphasis, #1f883d));
+  border-color: var(--button-primary-borderColor-rest, rgba(31, 35, 40, 0.15));
+}
+
+.ghwho-btn-primary:hover:not(:disabled) {
+  background-color: var(--button-primary-bgColor-hover, #1c8139);
+}
+
+.ghwho-btn-danger {
+  color: var(--button-danger-fgColor-rest, var(--fgColor-danger, #d1242f));
+}
+
+.ghwho-btn-danger:hover:not(:disabled) {
+  color: var(--button-danger-fgColor-hover, #ffffff);
+  background-color: var(--button-danger-bgColor-hover, var(--bgColor-danger-emphasis, #cf222e));
+  border-color: transparent;
+}

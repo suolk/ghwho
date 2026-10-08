@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>GitHub 用户备注</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <img class="logo" src="../icons/icon-32.png" width="20" height="20" alt="">
+    <h1>GitHub 用户备注</h1>
+    <button id="open-tab" class="icon-btn" type="button" title="在标签页中打开">⤢</button>
+  </header>
+
+  <section id="perm-banner" class="banner banner-warn" hidden>
+    <div>
+      <strong>尚未授权访问 github.com</strong>
+      <p>扩展需要该权限才能在 GitHub 页面上显示备注。</p>
+    </div>
+    <button id="perm-grant" class="btn btn-primary" type="button">授权</button>
+  </section>
+
+  <div id="flash" class="banner" role="status" hidden></div>
+
+  <section class="toolbar">
+    <input id="search" class="input" type="search" placeholder="搜索用户名或备注…" autocomplete="off" spellcheck="false">
+    <button id="add-toggle" class="btn" type="button" aria-expanded="false">+ 新增</button>
+  </section>
+
+  <form id="add-form" class="add-form" hidden>
+    <input id="add-user" class="input" type="text" placeholder="GitHub 用户名" autocomplete="off" spellcheck="false" required>
+    <textarea id="add-note" class="input" rows="2" placeholder="备注内容" required></textarea>
+    <div class="row-actions">
+      <button class="btn" type="button" id="add-cancel">取消</button>
+      <button class="btn btn-primary" type="submit">保存</button>
+    </div>
+  </form>
+
+  <main>
+    <p id="empty" class="empty" hidden></p>
+    <ul id="list" class="list"></ul>
+  </main>
+
+  <footer class="bottom">
+    <div class="usage">
+      <div class="meter"><div id="meter-bar" class="meter-bar"></div></div>
+      <span id="usage-text"></span>
+    </div>
+    <div class="io">
+      <button id="export" class="btn" type="button">导出 JSON</button>
+      <select id="import-mode" class="input select" title="导入方式">
+        <option value="merge">合并导入</option>
+        <option value="replace">覆盖导入</option>
+      </select>
+      <button id="import" class="btn" type="button">导入 JSON</button>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+    </div>
+  </footer>
+
+  <script src="../src/storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

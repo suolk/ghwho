@@ -1,0 +1,168 @@
+# ghwho
+
+[简体中文](README.md) | **English**
+
+Add private notes to GitHub users, right next to their names. Works on Microsoft Edge and Firefox (Manifest V3).
+
+> Coming soon to Edge Add-ons and Firefox Add-ons. Until then, load it from source as described below.
+>
+> The interface is currently in Simplified Chinese only.
+
+## Features
+
+- **Notes everywhere**: user profiles (full note under the name), followers / following lists, organization and team member pages, issue / PR / comment authors, repository contributor lists, sidebar participant avatars
+- **Click to edit**: click a note tag to add, edit or delete it in a small popover (`Ctrl+Enter` to save, `Esc` to cancel)
+- **Unobtrusive**: users without a note only show a faint `+备注` ("add note") button on hover; @mentions in comment text and hovercards only show existing notes
+- **Theme-aware**: follows GitHub's light / dark theme
+- **Manager panel**: click the toolbar icon to search all notes, edit or delete them, add one manually, and see storage usage
+- **Backup & migration**: JSON export / import, also for moving between Edge and Firefox
+- **Private**: no server and no network requests. Notes stay in your own browser and sync through your own browser account if browser sync is on
+
+## Install
+
+### From the stores
+
+Coming soon.
+
+### Load from source (development / preview)
+
+Clone the repository with `git clone https://github.com/suolk/ghwho.git`, or use **Code → Download ZIP** and unzip it.
+
+**Edge**
+
+1. Open `edge://extensions` and turn on **Developer mode**
+2. Click **Load unpacked** and select the repository root (the folder containing `manifest.json`)
+3. A warning that `browser_specific_settings` is unrecognized can be ignored; it is a Firefox-only key
+
+**Firefox**
+
+1. Open `about:debugging#/runtime/this-firefox`
+2. Click **Load Temporary Add-on…** and select `manifest.json` in the repository root
+3. If the toolbar panel says it has no access to github.com ("尚未授权访问 github.com"), click **授权** (Grant) and allow it
+4. Temporary add-ons are removed when Firefox closes
+
+Then open any GitHub page. After changing the code, click **Reload** on the extensions page and refresh the GitHub tab.
+
+## Usage
+
+- **Add a note**: hover near a username and click `+备注`, or click **+ 添加备注** under the name on a profile page
+- **Edit / delete**: click the yellow note tag
+- **Manage all notes**: click the extension icon in the toolbar
+
+### Moving between Edge and Firefox
+
+1. In the old browser's panel, click **导出 JSON** (Export JSON) to get `ghwho-notes-YYYYMMDD.json`
+2. In the new browser's panel, choose **合并导入** (merge: keep the newer note per user) or **覆盖导入** (replace: clear everything first), then click **导入 JSON** (Import JSON) and pick the file
+
+> Firefox closes the toolbar panel when a file picker opens, so on Firefox the import button opens the manager in a new tab, where you pick the file.
+
+<details>
+<summary>Export format</summary>
+
+```json
+{
+  "format": "ghwho-notes",
+  "version": 1,
+  "exportedAt": "2026-10-08T12:00:00.000Z",
+  "notes": {
+    "torvalds": { "note": "Creator of Linux", "updatedAt": 1791460000000 }
+  }
+}
+```
+
+Import also accepts a plain `{ "username": { "note", "updatedAt" } }` object, `{ "username": "note" }`, or `[{ "username", "note" }]`.
+
+</details>
+
+## Storage & quotas
+
+- Uses the browser's `storage.sync`. Keys are lowercase GitHub usernames; values are `{ note, updatedAt }`
+- Browser limits: about **100KB** total, about **8KB** per item, at most **512** items; each note is limited to 2000 characters
+- Saving and importing check the quota first and show a message instead of writing partially
+- The panel footer shows current usage and turns amber near the limit
+
+## Security & privacy
+
+- Note text is always inserted with `textContent`, never `innerHTML`; HTML or scripts in a note are shown as plain text
+- No background script, no network requests, no data collection
+- Only two permissions: `storage` (save notes) and `https://github.com/*` (show notes on GitHub)
+
+---
+
+## Development
+
+### Layout
+
+```
+manifest.json         Extension manifest (MV3, with Firefox browser_specific_settings.gecko)
+src/selectors.js      All selectors and matching rules (the main file to update when GitHub changes)
+src/storage.js        Storage wrapper: storage.sync, quota checks, import / export
+src/content.js        Injection: user link detection, tags, editor popover, DOM / Turbo observers
+src/content.css       Tag and popover styles (GitHub CSS variables)
+popup/                Toolbar panel: popup.html / popup.js / popup.css
+icons/                16 / 32 / 48 / 128 icons
+scripts/pack.mjs      Dependency-free packer that builds the Edge and Firefox zips
+```
+
+All extension API calls go through `const api = globalThis.browser ?? globalThis.chrome;`, so the same code runs on Edge and Firefox.
+
+### Maintaining selectors
+
+Everything lives in [`src/selectors.js`](src/selectors.js):
+
+| Key | Purpose |
+| --- | --- |
+| `userLinks` | Selectors treated as user links directly (default `a[data-hovercard-type="user"]`, …) |
+| `fallbackLinks` + `reservedPaths` | URL fallback: `/<username>` links whose text is the username and whose path is not reserved |
+| `avatar` | Detects avatar-only links |
+| `ignoreWithin` | Areas never processed (global header, footer, …) |
+| `noAddWithin` | Areas that show existing notes but no `+备注` button |
+| `profile` | The username block on profile pages |
+
+Debugging tip: processed links get a `data-ghwho-user` attribute (the detected username, or an empty string for non-user links). Inspect them with `document.querySelectorAll('[data-ghwho-user]')`.
+
+GitHub is a Turbo-driven single-page app. The script rescans on `MutationObserver` changes and on `turbo:load` / `turbo:render` / `turbo:frame-load`, and removes its injected nodes on `turbo:before-cache` so cached snapshots don't get duplicate tags.
+
+### Packaging
+
+Requires Node.js 18+:
+
+```bash
+node scripts/pack.mjs
+```
+
+This creates `dist/ghwho-edge-<version>.zip` (without `browser_specific_settings`) and `dist/ghwho-firefox-<version>.zip` (manifest unchanged).
+
+> Don't use `Compress-Archive` from Windows PowerShell 5.1: it writes backslashes into zip paths, which addons.mozilla.org rejects. `npx web-ext build` also works.
+
+Bump `version` in `manifest.json` before each release.
+
+### Publishing to Edge Add-ons
+
+1. Sign in to [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview) with a Microsoft account (developer registration is free)
+2. **Create new extension** → upload `dist/ghwho-edge-<version>.zip`
+3. Fill in the listing: name, description, category, at least one screenshot (1280×800 or 640×400)
+4. Privacy: no personal data collected; permissions: `storage` saves notes, `https://github.com/*` shows notes on GitHub
+5. Submit for review; upload new zips to the same extension for updates
+
+### Publishing to addons.mozilla.org (AMO)
+
+1. The add-on ID is `ghwho@suolk.cc.cd` (`manifest.json` → `browser_specific_settings.gecko.id`). The first upload ties it to the publisher's AMO account; **never change it afterwards**, or AMO treats it as a different add-on and existing users stop getting updates
+2. Recommended check: `npx web-ext lint`
+3. Go to the [AMO Developer Hub](https://addons.mozilla.org/developers/) → **Submit a New Add-on**, and choose **On this site** (listed) or **On your own** (signed `.xpi` for self-distribution)
+4. Upload `dist/ghwho-firefox-<version>.zip`; the code is not minified or transpiled, so no separate source upload is needed
+5. Fill in the description, screenshots, category, license (MIT) and privacy policy (no data collected); `data_collection_permissions` is already declared as `none` in the manifest
+6. Once automated review passes, it is signed and listed. From the command line:
+
+```bash
+npx web-ext sign --channel=listed --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET
+```
+
+### Compatibility
+
+- Edge / Chrome 109+
+- Firefox 140+ (`data_collection_permissions` needs 140 or later; AMO requires it for new add-ons)
+
+## License
+
+[MIT](LICENSE) © 2026 suolk
