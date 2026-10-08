@@ -133,43 +133,16 @@ GitHub 是 Turbo 驱动的单页应用，脚本通过 `MutationObserver` 加 `tu
 
 ### 打包
 
-需要 Node.js 18+：
-
 ```bash
 node scripts/pack.mjs
 ```
 
-生成 `dist/ghwho-edge-<version>.zip`（去掉了 `browser_specific_settings`）和 `dist/ghwho-firefox-<version>.zip`（原样清单）。
-
-> 不要用 Windows PowerShell 5.1 的 `Compress-Archive` 打包：它生成的 zip 内部路径使用反斜杠，addons.mozilla.org 会拒绝。也可以用 Mozilla 官方工具 `npx web-ext build`。
-
-发布新版本前记得修改 `manifest.json` 中的 `version`。
-
-### 发布到 Edge Add-ons
-
-1. 用 Microsoft 账号登录 [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview)，首次需要注册开发者账号（免费）
-2. **Create new extension** → 上传 `dist/ghwho-edge-<version>.zip`
-3. 填写商店信息：名称、描述、类别、截图（至少 1 张，1280×800 或 640×400）
-4. 隐私：不收集个人数据；权限用途：`storage` 保存备注，`https://github.com/*` 在 GitHub 页面上显示备注
-5. 提交审核；更新时在同一扩展下上传新版本 zip
-
-### 发布到 addons.mozilla.org（AMO）
-
-1. 扩展 ID 为 `ghwho@suolk.cc.cd`（`manifest.json` → `browser_specific_settings.gecko.id`）。首次上传后该 ID 即归属发布者的 AMO 账号，**之后不要再改**，否则会被当作另一个扩展，已安装的用户收不到更新
-2. 建议先检查：`npx web-ext lint`
-3. 登录 [AMO 开发者中心](https://addons.mozilla.org/developers/) → **Submit a New Add-on**，选择 **On this site**（公开上架）或 **On your own**（只签名，自行分发 `.xpi`）
-4. 上传 `dist/ghwho-firefox-<version>.zip`；代码没有经过压缩或转换，无需另外提交源码
-5. 填写描述、截图、分类、许可证（MIT）、隐私政策（不收集数据）；`data_collection_permissions` 已在清单中声明为 `none`
-6. 通过自动审核后即签名上架；也可以用命令行：
-
-```bash
-npx web-ext sign --channel=listed --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET
-```
+在 `dist/` 下生成 Edge 和 Firefox 两个 zip 包（需要 Node.js 18+）。
 
 ### 兼容性
 
 - Edge / Chrome 109+
-- Firefox 140+（`data_collection_permissions` 需要 140 及以上；AMO 要求新上架的扩展声明此字段）
+- Firefox 140+
 
 ## 许可证
 

@@ -133,43 +133,16 @@ GitHub is a Turbo-driven single-page app. The script rescans on `MutationObserve
 
 ### Packaging
 
-Requires Node.js 18+:
-
 ```bash
 node scripts/pack.mjs
 ```
 
-This creates `dist/ghwho-edge-<version>.zip` (without `browser_specific_settings`) and `dist/ghwho-firefox-<version>.zip` (manifest unchanged).
-
-> Don't use `Compress-Archive` from Windows PowerShell 5.1: it writes backslashes into zip paths, which addons.mozilla.org rejects. `npx web-ext build` also works.
-
-Bump `version` in `manifest.json` before each release.
-
-### Publishing to Edge Add-ons
-
-1. Sign in to [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview) with a Microsoft account (developer registration is free)
-2. **Create new extension** → upload `dist/ghwho-edge-<version>.zip`
-3. Fill in the listing: name, description, category, at least one screenshot (1280×800 or 640×400)
-4. Privacy: no personal data collected; permissions: `storage` saves notes, `https://github.com/*` shows notes on GitHub
-5. Submit for review; upload new zips to the same extension for updates
-
-### Publishing to addons.mozilla.org (AMO)
-
-1. The add-on ID is `ghwho@suolk.cc.cd` (`manifest.json` → `browser_specific_settings.gecko.id`). The first upload ties it to the publisher's AMO account; **never change it afterwards**, or AMO treats it as a different add-on and existing users stop getting updates
-2. Recommended check: `npx web-ext lint`
-3. Go to the [AMO Developer Hub](https://addons.mozilla.org/developers/) → **Submit a New Add-on**, and choose **On this site** (listed) or **On your own** (signed `.xpi` for self-distribution)
-4. Upload `dist/ghwho-firefox-<version>.zip`; the code is not minified or transpiled, so no separate source upload is needed
-5. Fill in the description, screenshots, category, license (MIT) and privacy policy (no data collected); `data_collection_permissions` is already declared as `none` in the manifest
-6. Once automated review passes, it is signed and listed. From the command line:
-
-```bash
-npx web-ext sign --channel=listed --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET
-```
+Builds the Edge and Firefox zips in `dist/` (requires Node.js 18+).
 
 ### Compatibility
 
 - Edge / Chrome 109+
-- Firefox 140+ (`data_collection_permissions` needs 140 or later; AMO requires it for new add-ons)
+- Firefox 140+
 
 ## License
 
