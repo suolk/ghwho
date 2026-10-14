@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ghwho 备注预览演示</title>
+  <link rel="stylesheet" href="demo.css">
+  <link rel="stylesheet" href="../src/content.css">
+</head>
+<body>
+  <header class="demo-topbar">
+    <div class="demo-brand"><span class="demo-mark" aria-hidden="true">g</span> ghwho <span class="demo-pill">本地演示</span></div>
+    <div class="demo-controls">
+      <button id="theme-toggle" type="button">切换深色</button>
+      <button id="lang-toggle" type="button">English 预览</button>
+      <button id="reset" type="button">恢复示例</button>
+    </div>
+  </header>
+  <main>
+    <div class="demo-intro">
+      <div class="demo-eyebrow">GitHub 用户私人备注</div>
+      <h1>停一下，就能读到完整备注。</h1>
+      <p>鼠标停在黄色标签上约 350 毫秒，再移入卡片，就能阅读、选择文字和点击网址。长备注可以在卡片里滚动查看。</p>
+      <p class="demo-caption">点击黄色标签可以编辑。示例备注只保存在当前页面，刷新后恢复；点击备注中的网址会打开新标签页。</p>
+    </div>
+    <div class="demo-grid">
+      <section class="demo-panel demo-feed" aria-labelledby="feed-title">
+        <div class="demo-panel-heading"><h2 id="feed-title">动态列表</h2><span>Activity</span></div>
+        <article class="demo-event" id="featured-event">
+          <span class="demo-avatar demo-avatar-purple" aria-hidden="true">S</span>
+          <div class="demo-event-content">
+            <div class="demo-byline"><a id="featured-user" href="https://github.com/SXP-Simon" data-hovercard-type="user">SXP-Simon</a> <span class="demo-action">starred a repository</span></div>
+            <div class="demo-repository"><span class="demo-repo-icon" aria-hidden="true">▣</span><strong>open-tools / agent-notes</strong><p>Small tools for everyday work.</p><div class="demo-repo-meta"><span class="demo-dot"></span> TypeScript <span>☆ 128</span></div></div>
+            <time>2 小时前</time>
+          </div>
+        </article>
+        <article class="demo-event">
+          <span class="demo-avatar demo-avatar-green" aria-hidden="true">L</span>
+          <div class="demo-event-content"><div class="demo-byline"><a href="https://github.com/lin" data-hovercard-type="user">lin</a> <span class="demo-action">released a new version</span></div><p class="demo-event-line">一条短备注，预览卡片会随内容收缩。</p><time>4 小时前</time></div>
+        </article>
+        <article class="demo-event">
+          <span class="demo-avatar demo-avatar-blue" aria-hidden="true">N</span>
+          <div class="demo-event-content"><div class="demo-byline"><a href="https://github.com/newcomer" data-hovercard-type="user">newcomer</a> <span class="demo-action">opened an issue</span></div><p class="demo-event-line">还没有备注。悬停这一行可以找到添加入口。</p><time>昨天</time></div>
+        </article>
+        <article class="demo-event">
+          <span class="demo-avatar demo-avatar-orange" aria-hidden="true">A</span>
+          <div class="demo-event-content"><div class="demo-byline"><a href="https://github.com/archive-user" data-hovercard-type="user">archive-user</a> <span class="demo-action">contributed to a project</span></div><p class="demo-event-line">这里有一条 2000 字符的备注。移入预览卡片，滚动到底部可以找到末尾链接。</p><time>昨天</time></div>
+        </article>
+      </section>
+      <aside class="demo-side">
+        <section class="demo-panel demo-profile" aria-labelledby="profile-title">
+          <div class="demo-panel-heading"><h2 id="profile-title">个人主页</h2><span>Profile</span></div>
+          <span class="demo-avatar demo-profile-avatar demo-avatar-green" aria-hidden="true">L</span>
+          <div class="vcard-names"><strong class="demo-profile-name">Lin</strong><span class="p-nickname">lin</span></div>
+          <p class="demo-profile-bio">Build small things. Share what works.</p>
+        </section>
+        <section class="demo-panel demo-tip">
+          <h2>可以试试</h2>
+          <p>鼠标从标签移入卡片时，预览会保留。离开标签和卡片后会稍等片刻再关闭；按 Esc 可以立即关闭。</p>
+          <p>用 Tab 聚焦标签，再按一次 Tab 进入卡片，可以继续用键盘滚动和访问链接。右上角可以切换主题和预览语言。</p>
+        </section>
+      </aside>
+    </div>
+    <section class="demo-panel demo-comment" aria-labelledby="comment-title">
+      <div class="demo-panel-heading"><h2 id="comment-title">Issue 评论</h2><span>#42 · Preview behavior</span></div>
+      <div class="demo-comment-author"><a href="https://github.com/SXP-Simon" data-hovercard-type="user">SXP-Simon</a><span>commented today</span></div>
+      <div class="markdown-body"><p>谢谢 <a href="https://github.com/lin">@lin</a> 的反馈，多行备注和长链接都可以在预览里阅读。</p></div>
+    </section>
+    <footer class="demo-footer">ghwho · 示例页面使用项目里的标签、预览和编辑器代码。</footer>
+  </main>
+  <script src="demo.js"></script>
+  <script src="../src/selectors.js"></script>
+  <script src="../src/i18n.js"></script>
+  <script src="../src/storage.js"></script>
+  <script src="../src/content.js"></script>
+</body>
+</html>

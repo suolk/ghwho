@@ -10,6 +10,7 @@
 
 - **到处都能看到备注**：用户个人主页（名字下方显示完整备注）、followers / following 列表、组织和团队成员页、issue / PR / 评论区的作者名、仓库贡献者列表、侧边栏参与者头像
 - **点击即可编辑**：点标签弹出小窗口，添加、修改或删除备注（`Ctrl+Enter` 保存，`Esc` 取消）
+- **悬停阅读**：在已有黄色备注标签上停留约 350 毫秒，再把鼠标移入预览卡片阅读；支持选择文字、滚动查看长备注，备注中的 HTTP / HTTPS 网址和 `www.` 网址可以点击，在新标签页打开
 - **不打扰**：没有备注的用户只在鼠标悬停时显示一个淡淡的 `+备注`；正文里的 @mention 和悬停卡片只显示已有备注
 - **跟随主题**：自动适配 GitHub 的亮色 / 暗色主题
 - **管理面板**：点击工具栏图标，可以搜索全部备注、编辑删除、手动新增、查看存储用量
@@ -48,6 +49,7 @@
 
 - **添加备注**：鼠标悬停在用户名附近，点击出现的 `+备注`；或在个人主页名字下方点 **+ 添加备注**
 - **编辑 / 删除**：点击黄色的备注标签
+- **预览备注**：悬停黄色标签，或用 Tab 聚焦；鼠标可移入卡片，长备注可在卡片里滚动。离开标签和卡片约 250 毫秒后关闭，滚动外部页面或按 `Esc` 立即关闭。聚焦标签后再按 Tab 可进入卡片，继续访问其中的链接
 - **管理全部备注**：点击浏览器工具栏中的扩展图标
 
 ### 在 Edge 和 Firefox 之间迁移
@@ -84,8 +86,8 @@
 
 ## 安全与隐私
 
-- 备注文本一律通过 `textContent` 插入页面，不使用 `innerHTML`，备注中写 HTML / 脚本只会原样显示为文字
-- 没有后台脚本，不发起任何网络请求，不收集任何数据
+- 备注使用文本节点插入页面，不使用 `innerHTML`；HTML / 脚本会原样显示为文字，HTTP / HTTPS 网址会生成可点击链接
+- 没有后台脚本，不自动发起网络请求，不收集任何数据；点击备注中的网址时，由浏览器打开对应页面
 - 只申请两项权限：`storage`（保存备注）和 `https://github.com/*`（在 GitHub 页面上显示备注）
 
 ## 反馈
@@ -106,14 +108,20 @@ _locales/             扩展名称、描述的中英文（浏览器标准 i18n�
 src/selectors.js      所有选择器与识别规则（GitHub 改版后主要改这里）
 src/i18n.js           界面文案（中文 / English）与语言切换
 src/storage.js        存储封装：storage.sync、配额检查、导入导出
-src/content.js        注入逻辑：识别用户链接、渲染标签、编辑弹窗、监听 DOM / Turbo
-src/content.css       标签与弹窗样式（使用 GitHub 的 CSS 变量）
+src/content.js        注入逻辑：识别用户链接、渲染标签、悬停预览、编辑弹窗、监听 DOM / Turbo
+src/content.css       标签、预览与弹窗样式（使用 GitHub 的 CSS 变量）
 popup/                扩展面板 popup.html / popup.js / popup.css
 icons/                16 / 32 / 48 / 128 图标
 scripts/pack.mjs      打包脚本（无依赖），生成 Edge 与 Firefox 的 zip
+scripts/test-preview.mjs  Edge 浏览器中的预览交互检查（无第三方依赖）
+demo/                本地演示页面、亮暗主题截图与检查记录（不进入扩展安装包）
 ```
 
 代码中统一使用 `const api = globalThis.browser ?? globalThis.chrome;` 调用扩展 API，同一份代码同时运行在 Edge 和 Firefox 上。
+
+直接打开 [`demo/index.html`](demo/index.html) 可以试用预览、编辑和语言切换，示例数据只存在当前页面的内存里。检查交互可运行 `node scripts/test-preview.mjs`（Node.js 22+、Windows、已安装 Edge；其他安装路径用 `GHWHO_EDGE_PATH` 指定）。脚本把临时浏览器配置和缓存放在项目 `dist/` 下，结束后删除，并在 `demo/` 更新截图和检查记录。
+
+默认检查只使用本地示例页面，没有外部请求。加上 `--github` 会打开公开的 GitHub 个人主页和 Issue 页面，在独立脚本环境中使用示例备注检查标签、预览和编辑，并保存实际页面截图。测试不读取现有的浏览器备注。Firefox、登录后的动态列表和 GitHub 原生 Hovercard 共存仍需手动验证。
 
 ### 界面语言
 

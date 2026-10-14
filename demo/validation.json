@@ -1,0 +1,56 @@
+{
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Edg/155.0.4283.45",
+    "revision": "@50f24ef2aa5369a074b8888b7db82d9c0652d642",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0",
+    "jsVersion": "15.5.9.4"
+  },
+  "checks": [
+    "原有注入场景和原生提示",
+    "真实鼠标悬停延时和多行文本",
+    "亮暗主题截图和页面布局稳定",
+    "真实鼠标跨过空隙移入卡片，可停留和选择备注文字",
+    "备注网址可真实点击，在新标签页打开目标页面",
+    "快速划过、离开、切换用户、未备注用户",
+    "点击编辑、编辑期间禁用预览、取消后恢复焦点",
+    "键盘焦点、Esc、Enter 和 Space",
+    "键盘可进入卡片和网址，Esc 或 Shift+Tab 返回标签",
+    "保存、删除和同一用户的多处标签",
+    "同步变更立即关闭旧数据和待显示计时器",
+    "语言切换关闭旧卡片，新卡片显示英文",
+    "长备注可在卡片内用真实滚轮读到末尾，页面不滚动",
+    "纯文本插入和长 URL 自动换行",
+    "网址识别保留原文、句末标点和配对括号，脚本文字不执行",
+    "头像图标也能预览，GitHub 链接不触发预览",
+    "右侧、底部、窄视口和缩放尺寸定位",
+    "页面和嵌套容器滚动关闭预览及待显示计时器",
+    "节点移除和用户名重识别",
+    "用户名链接改为其他链接时不保留旧标签",
+    "用户链接单独删除时，标签和预览一起移除",
+    "个人主页文本更新后重新识别用户名",
+    "Turbo 导航、缓存清理和浏览器前进后退",
+    "连续切换只保留一个预览，无页面异常或外部请求",
+    "演示 HTML 可以直接从本地文件打开"
+  ],
+  "exceptions": 0,
+  "externalRequests": [],
+  "publicGitHub": [
+    {
+      "url": "https://github.com/torvalds",
+      "user": "torvalds",
+      "preview": "passed",
+      "hoverWithinCard": "passed",
+      "noteLinks": "passed",
+      "editor": "passed"
+    },
+    {
+      "url": "https://github.com/microsoft/vscode/issues/1",
+      "user": "chrisdias",
+      "preview": "passed",
+      "hoverWithinCard": "passed",
+      "noteLinks": "passed",
+      "editor": "passed"
+    }
+  ]
+}

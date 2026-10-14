@@ -31,6 +31,10 @@
       'badge.noteAria': '@{user} 的备注：{note}。点击编辑',
       'badge.addTitle': '为 @{user} 添加备注',
 
+      'preview.private': '私人备注',
+      'preview.scroll': '可滚动查看完整备注',
+      'preview.aria': '@{user} 的备注预览',
+
       'editor.placeholder': '写点什么……（Ctrl+Enter 保存，Esc 取消）',
       'editor.textareaAria': '@{user} 的备注',
       'editor.dialogAria': '编辑 @{user} 的备注',
@@ -112,6 +116,10 @@
       'badge.noteTitle': 'Note on @{user}:\n{note}\n\nClick to edit',
       'badge.noteAria': 'Note on @{user}: {note}. Click to edit',
       'badge.addTitle': 'Add a note for @{user}',
+
+      'preview.private': 'Private note',
+      'preview.scroll': 'Scroll to read the full note',
+      'preview.aria': 'Note preview for @{user}',
 
       'editor.placeholder': 'Write something… (Ctrl+Enter to save, Esc to cancel)',
       'editor.textareaAria': 'Note on @{user}',
