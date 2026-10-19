@@ -82,6 +82,8 @@
     if (!user) return null;
     const text = linkText(a).replace(/^@/, '').toLowerCase();
     if (text === user || (!text && a.querySelector(S.avatar))) return user;
+    // PR 侧栏等处显示为「昵称 (用户名)」
+    if (text.endsWith(`(${user})`)) return user;
     return null;
   }
 
@@ -216,6 +218,19 @@
     state.set(container, { user, badge: wrap });
   }
 
+  /*
+   * 移除落单的标签：React 重渲染时可能删掉旧链接、把新链接插到别处，
+   * 我们插在旧链接后面的标签不受 React 管理，会留在原地，和新链接的标签重复。
+   * 标签总是紧跟在所属节点之后，前一个节点不再拥有它就说明已经落单。
+   */
+  function removeOrphans(root) {
+    for (const node of root.querySelectorAll('.ghwho-badge, .ghwho-profile')) {
+      if (node.parentElement?.classList.contains('ghwho-profile')) continue; // 主页标签由外层容器负责
+      const owner = node.previousElementSibling;
+      if (!owner || state.get(owner)?.badge !== node) node.remove();
+    }
+  }
+
   function scan(root) {
     if (!root || (root.nodeType !== 1 && root.nodeType !== 9)) return;
     if (root.nodeType === 1 && root.closest('.ghwho-badge, .ghwho-popover, .ghwho-profile')) return;
@@ -224,6 +239,7 @@
 
     if (root.nodeType === 1 && root.matches('a') && root.matches(LINK_QUERY)) processLink(root);
     for (const a of root.querySelectorAll(LINK_QUERY)) processLink(a);
+    removeOrphans(root);
   }
 
   /* 清理全部注入内容（Turbo 缓存页面前调用，避免快照里残留标签） */
