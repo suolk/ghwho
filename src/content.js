@@ -110,7 +110,10 @@
     badge.dataset.ghwhoMode = mode;
     badge.addEventListener('click', onBadgeClick);
     badge.addEventListener('mouseenter', () => schedulePreview(badge));
-    badge.addEventListener('focus', () => schedulePreview(badge, { immediate: true }));
+    // 鼠标点击也会让按钮获得焦点；这时不立即预览，否则打开编辑弹窗前会闪一下
+    badge.addEventListener('focus', () => {
+      if (pressedBadge !== badge) schedulePreview(badge, { immediate: true });
+    });
     badge.addEventListener('mouseleave', onPreviewLeave);
     badge.addEventListener('blur', onPreviewLeave);
     badge.addEventListener('keydown', (e) => {
@@ -121,7 +124,14 @@
       }
     });
     // 防止 GitHub 的委托事件（如整行可点击）误响应
-    badge.addEventListener('mousedown', (e) => e.stopPropagation());
+    badge.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      // 获得焦点是 mousedown 的默认行为，在同一个任务里发生，下一个任务再清除标记
+      pressedBadge = badge;
+      setTimeout(() => {
+        if (pressedBadge === badge) pressedBadge = null;
+      });
+    });
     renderBadge(badge);
     return badge;
   }
@@ -352,6 +362,7 @@
   let previewTimer = 0;
   let previewCloseTimer = 0;
   let previewByFocus = false;
+  let pressedBadge = null; // 正在被鼠标按下的标签
   let restoringEditorFocus = false;
 
   function cancelPreviewClose() {

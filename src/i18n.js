@@ -27,7 +27,6 @@
 
       'badge.addInline': '+备注',
       'badge.addProfile': '+ 添加备注',
-      'badge.noteTitle': '@{user} 的备注：\n{note}\n\n点击编辑',
       'badge.noteAria': '@{user} 的备注：{note}。点击编辑',
       'badge.addTitle': '为 @{user} 添加备注',
 
@@ -113,7 +112,6 @@
 
       'badge.addInline': '+ Note',
       'badge.addProfile': '+ Add note',
-      'badge.noteTitle': 'Note on @{user}:\n{note}\n\nClick to edit',
       'badge.noteAria': 'Note on @{user}: {note}. Click to edit',
       'badge.addTitle': 'Add a note for @{user}',
 
