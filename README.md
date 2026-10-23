@@ -113,15 +113,9 @@ src/content.css       标签、预览与弹窗样式（使用 GitHub 的 CSS 变
 popup/                扩展面板 popup.html / popup.js / popup.css
 icons/                16 / 32 / 48 / 128 图标
 scripts/pack.mjs      打包脚本（无依赖），生成 Edge 与 Firefox 的 zip
-scripts/test-preview.mjs  Edge 浏览器中的预览交互检查（无第三方依赖）
-demo/                本地演示页面、亮暗主题截图与检查记录（不进入扩展安装包）
 ```
 
 代码中统一使用 `const api = globalThis.browser ?? globalThis.chrome;` 调用扩展 API，同一份代码同时运行在 Edge 和 Firefox 上。
-
-直接打开 [`demo/index.html`](demo/index.html) 可以试用预览、编辑和语言切换，示例数据只存在当前页面的内存里。检查交互可运行 `node scripts/test-preview.mjs`（Node.js 22+、Windows、已安装 Edge；其他安装路径用 `GHWHO_EDGE_PATH` 指定）。脚本把临时浏览器配置和缓存放在项目 `dist/` 下，结束后删除，并在 `demo/` 更新截图和检查记录。
-
-默认检查只使用本地示例页面，没有外部请求。加上 `--github` 会打开公开的 GitHub 个人主页和 Issue 页面，在独立脚本环境中使用示例备注检查标签、预览和编辑，并保存实际页面截图。测试不读取现有的浏览器备注。Firefox、登录后的动态列表和 GitHub 原生 Hovercard 共存仍需手动验证。
 
 ### 界面语言
 

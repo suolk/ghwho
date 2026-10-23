@@ -113,15 +113,9 @@ src/content.css       Tag, preview and popover styles (GitHub CSS variables)
 popup/                Toolbar panel: popup.html / popup.js / popup.css
 icons/                16 / 32 / 48 / 128 icons
 scripts/pack.mjs      Dependency-free packer that builds the Edge and Firefox zips
-scripts/test-preview.mjs  Preview interaction checks in Edge (no third-party dependencies)
-demo/                Local demo, theme screenshots and check results (excluded from extension packages)
 ```
 
 All extension API calls go through `const api = globalThis.browser ?? globalThis.chrome;`, so the same code runs on Edge and Firefox.
-
-Open [`demo/index.html`](demo/index.html) directly to try previews, editing and language switching. Sample notes live only in page memory. Run `node scripts/test-preview.mjs` for browser checks (Node.js 22+, Windows and an existing Edge installation; set `GHWHO_EDGE_PATH` for another install path). Temporary browser profiles and caches stay under this project's `dist/` and are removed when the script finishes. Screenshots and check results are saved in `demo/`.
-
-The default checks use only the local demo, with no external requests. Add `--github` to open public GitHub profile and Issue pages, check tags, previews and editing in an isolated script environment with sample notes, and save live-page screenshots. The tests do not read existing browser notes. Firefox, the signed-in activity feed and native Hovercard coexistence still need manual testing.
 
 ### UI language
 
