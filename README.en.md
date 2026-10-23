@@ -10,6 +10,7 @@ Add private notes to GitHub users, right next to their names. Works on Microsoft
 
 - **Notes everywhere**: user profiles (full note under the name), followers / following lists, organization and team member pages, issue / PR / comment authors, repository contributor lists, sidebar participant avatars
 - **Click to edit**: click a note tag to add, edit or delete it in a small popover (`Ctrl+Enter` to save, `Esc` to cancel)
+- **Hover to read**: stay on an existing yellow note tag for about 350 ms, then move into the preview to read, select text and scroll through long notes. HTTP / HTTPS and `www.` URLs in notes are clickable and open in a new tab
 - **Unobtrusive**: users without a note only show a faint `+ Note` button on hover; @mentions in comment text and hovercards only show existing notes
 - **Theme-aware**: follows GitHub's light / dark theme
 - **Manager panel**: click the toolbar icon to search all notes, edit or delete them, add one manually, and see storage usage
@@ -48,6 +49,7 @@ Then open any GitHub page. After changing the code, click **Reload** on the exte
 
 - **Add a note**: hover near a username and click `+ Note`, or click **+ Add note** under the name on a profile page
 - **Edit / delete**: click the yellow note tag
+- **Preview a note**: hover a yellow tag or focus it with Tab. Move into the card to read and scroll. Leaving both the tag and the card closes it after about 250 ms; scrolling the surrounding page or pressing `Esc` closes it immediately. Press Tab again from the tag to enter the card and reach its links
 - **Manage all notes**: click the extension icon in the toolbar
 
 ### Moving between Edge and Firefox
@@ -84,8 +86,8 @@ Import also accepts a plain `{ "username": { "note", "updatedAt" } }` object, `{
 
 ## Security & privacy
 
-- Note text is always inserted with `textContent`, never `innerHTML`; HTML or scripts in a note are shown as plain text
-- No background script, no network requests, no data collection
+- Notes are inserted as text nodes, never through `innerHTML`. HTML and scripts remain plain text; HTTP / HTTPS URLs become clickable links
+- No background script, automatic network requests or data collection. Clicking a note URL opens the destination in your browser
 - Only two permissions: `storage` (save notes) and `https://github.com/*` (show notes on GitHub)
 
 ## Feedback
@@ -106,8 +108,8 @@ _locales/             Localized extension name and description (standard browser
 src/selectors.js      All selectors and matching rules (the main file to update when GitHub changes)
 src/i18n.js           UI strings (Chinese / English) and language switching
 src/storage.js        Storage wrapper: storage.sync, quota checks, import / export
-src/content.js        Injection: user link detection, tags, editor popover, DOM / Turbo observers
-src/content.css       Tag and popover styles (GitHub CSS variables)
+src/content.js        Injection: user link detection, tags, hover previews, editor popover, DOM / Turbo observers
+src/content.css       Tag, preview and popover styles (GitHub CSS variables)
 popup/                Toolbar panel: popup.html / popup.js / popup.css
 icons/                16 / 32 / 48 / 128 icons
 scripts/pack.mjs      Dependency-free packer that builds the Edge and Firefox zips

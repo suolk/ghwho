@@ -1,5 +1,5 @@
 /*
- * 备注标签与编辑弹窗样式。
+ * 备注标签、只读预览与编辑弹窗样式。
  * 颜色全部取自 GitHub (Primer) 的 CSS 变量，自动跟随亮色/暗色主题；
  * 第二个值是旧版变量名，最后是兜底色。
  */
@@ -129,6 +129,89 @@
   border: 1px dashed var(--borderColor-default, var(--color-border-default, #d1d9e0));
   opacity: 0.75;
   display: inline-flex;
+}
+
+/* ------------------------------------------------------------------ 备注预览 */
+
+.ghwho-preview {
+  position: fixed;
+  z-index: 2147482999;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 16px));
+  padding: 12px;
+  overflow: hidden;
+  pointer-events: auto;
+  user-select: text;
+  color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+  background-color: var(--overlay-bgColor, var(--bgColor-default, var(--color-canvas-overlay, #ffffff)));
+  border: 1px solid var(--borderColor-default, var(--color-border-default, #d1d9e0));
+  border-radius: 10px;
+  box-shadow: var(--shadow-floating-medium, var(--color-shadow-large, 0 8px 24px rgba(140, 149, 159, 0.2)));
+  font: 400 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  text-align: left;
+}
+
+.ghwho-preview * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.ghwho-preview [hidden] {
+  display: none !important;
+}
+
+.ghwho-preview-header {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.ghwho-preview-user {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ghwho-preview-meta {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--fgColor-muted, var(--color-fg-muted, #59636e));
+  font-size: 12px;
+}
+
+.ghwho-preview-body {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ghwho-preview-body:focus-visible,
+.ghwho-preview-link:focus-visible {
+  outline: 2px solid var(--focus-outlineColor, var(--color-accent-fg, #0969da));
+  outline-offset: 1px;
+}
+
+.ghwho-preview a.ghwho-preview-link {
+  color: var(--fgColor-accent, var(--color-accent-fg, #0969da)) !important;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ghwho-preview-hint {
+  flex-shrink: 0;
+  color: var(--fgColor-muted, var(--color-fg-muted, #59636e));
+  font-size: 12px;
 }
 
 /* ------------------------------------------------------------------ 编辑弹窗 */
